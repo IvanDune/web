@@ -1,0 +1,66 @@
+@page "/{hash}"
+@using System.Text.Json
+@inject IJSRuntime JS
+@inject HttpClient Http
+
+<script>
+function BlazorDownloadFile(filename, contentType, content) {
+    const file = new File([content], filename, { type: contentType });
+    const exportUrl = URL.createObjectURL(file);
+
+    const a = document.createElement("a");
+    document.body.appendChild(a);
+    a.href = exportUrl;
+    a.download = filename;
+    a.target = "_self";
+    a.click();
+
+    URL.revokeObjectURL(exportUrl);
+    }
+</script>
+
+<h3>@Hash</h3>
+
+@if (db_file != null)
+{
+    <p>Имя файла: @db_file.name</p>
+    <p>Дата публикации: @DateTimeOffset.FromUnixTimeSeconds(db_file.time).UtcDateTime.ToString() UTC</p>
+    <button @onclick="DownloadFileFromStream">
+        Скачать
+    </button>
+}
+
+@code {
+    [Parameter] public string? Hash { get; set; }
+
+    private DBFile? db_file;
+
+    protected override async Task OnInitializedAsync()
+    {
+        string data = await Http.GetStringAsync(($"http://127.0.0.1:5299/api/getfile?hash={Hash}"));
+        db_file = JsonSerializer.Deserialize<DBFile>(data);
+    }
+
+    public class DBFile
+    {
+        public string name { get; set; }
+        public string token { get; set; }
+        public int weight { get; set; }
+        public int time { get; set; }
+        public int counter { get; set; }
+    }
+
+    private async Task<byte[]> GetFileAsBytes()
+    {
+        var data = await Http.GetByteArrayAsync($"http://127.0.0.1:5299/api/download?hash={db_file.token}");
+
+        return data;
+    }
+
+    private async Task DownloadFileFromStream()
+    {
+        var file = await GetFileAsBytes();
+        await JS.InvokeVoidAsync("BlazorDownloadFile", db_file.name, "application/octet-stream", file);
+    }
+
+}

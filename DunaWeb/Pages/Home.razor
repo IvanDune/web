@@ -1,0 +1,67 @@
+﻿@page "/"
+@inject HttpClient Http
+@inject IJSRuntime JS
+@using System.Text
+
+<div class="main">
+    <h1>Duna Uploader</h1>
+    @if (!isUploading)
+    {
+        <InputFile OnChange="UploadFile"/>
+    }
+    else
+    {
+        <div class="uploading">
+            @if (result == null)
+            {
+                <p>No link yet ._.</p>
+            }
+            else
+            {
+                <p>Your link is <a href="http://localhost:5272/@result"></a>http://localhost:5272/@result</p>
+            <button @onclick="ReadTextAsync">
+                Скопировать в буфер обмена
+            </button>
+            }
+        </div>
+    }
+</div>
+
+@code {
+    private bool isUploading = false;
+
+    [Parameter] public string? result { get; set; }
+
+    private async void UploadFile(InputFileChangeEventArgs e)
+    {
+        var size = e.File.Size;
+        if (size > 8192 * 1024)
+        {
+            await JS.InvokeVoidAsync("alert", "Файл слишком большой! Лимит: 8мб.");
+            return;
+        }
+        isUploading = true;
+        var sizeBytes = BitConverter.GetBytes(size);
+        Console.WriteLine(sizeBytes.Length);
+
+        var name = e.File.Name;
+        var nameBytes = Encoding.UTF8.GetBytes(name);
+
+        var fileBytes = new byte[8 + nameBytes.Length + e.File.Size];
+        sizeBytes.CopyTo(fileBytes, 0);
+        nameBytes.CopyTo(fileBytes, 8);
+        var _ = await e.File.OpenReadStream(maxAllowedSize: 8192000).ReadAsync(fileBytes, 8 + nameBytes.Length, Convert.ToInt32(e.File.Size));
+
+        var byteContent = new ByteArrayContent(fileBytes);
+
+        var res = await Http.PostAsync("http://127.0.0.1:5299/api/upload", byteContent);
+        result = await res.Content.ReadAsStringAsync();
+        StateHasChanged();
+    }
+
+    private async Task ReadTextAsync()
+    {
+        await JS.InvokeVoidAsync("navigator.clipboard.writeText", "http://localhost:5272/" + result);
+    }
+
+}
