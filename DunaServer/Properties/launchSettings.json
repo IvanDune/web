@@ -16,12 +16,7 @@
       "launchUrl": "swagger",
       "applicationUrl": "http://localhost:5299",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development",
-        "MONGO_URL": "mongodb://duna:3cf9a12f376869cc86ca096f450fb4b87be7f059@46.138.252.231:27017/",
-        "HOSTNAME": "46.138.252.231",
-        "USER": "duna",
-        "PASSWORD": "3cf9a12f376869cc86ca096f450fb4b87be7f059",
-        "FILE_DIRECTORY": "C:\\Users\\ivang\\RiderProjects\\Duna1\\DunaService\\files"
+        "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
     "https": {

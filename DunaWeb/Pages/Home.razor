@@ -42,7 +42,6 @@
         }
         isUploading = true;
         var sizeBytes = BitConverter.GetBytes(size);
-        Console.WriteLine(sizeBytes.Length);
 
         var name = e.File.Name;
         var nameBytes = Encoding.UTF8.GetBytes(name);
@@ -62,6 +61,7 @@
     private async Task ReadTextAsync()
     {
         await JS.InvokeVoidAsync("navigator.clipboard.writeText", "http://localhost:5272/" + result);
+        await JS.InvokeVoidAsync("alert", "Скопировано в буфер обмена!");
     }
 
 }

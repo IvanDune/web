@@ -1,29 +1,17 @@
-﻿namespace DunaService;
+﻿using Handlers;
 
-using MongoDB.Driver;
-using MongoDB.Bson;
+namespace DunaService;
 
 class HourlyWorker : BackgroundService
 {
-    private readonly MongoClient client;
-    private IMongoDatabase database;
-    private IMongoCollection<BsonDocument> collection;
     private readonly ILogger<HourlyWorker> _logger;
+    private readonly MongoHandler mongo;
+    private readonly FileHandler file;
 
-    public HourlyWorker(ILogger<HourlyWorker> logger)
+    public HourlyWorker(ILogger<HourlyWorker> logger, MongoHandler _mongo, FileHandler _file)
     {
-        var mongo_address = Environment.GetEnvironmentVariable("MONGO_URL");
-
-        if (mongo_address == null)
-        {
-            Console.WriteLine("Установите параметр MONGO_URL");
-            return;
-        }
-
-        client = new MongoClient(mongo_address);
-        database = client.GetDatabase("duna");
-        collection = database.GetCollection<BsonDocument>("files");
-
+        mongo = _mongo;
+        file = _file;
         _logger = logger;
     }
 
@@ -31,24 +19,10 @@ class HourlyWorker : BackgroundService
     {
         while (!stoppingToken.IsCancellationRequested)
         {
-            var filter = Builders<BsonDocument>.Filter.Empty;
-            var update = Builders<BsonDocument>.Update.Inc("counter", -1);
-
-            await collection.UpdateManyAsync(filter, update, cancellationToken: stoppingToken);
-
-            // удаляем все элементы, в которых счётчик = 0
-            filter = Builders<BsonDocument>.Filter.Eq("counter", 0);
+            mongo.DecrementCounter();
             // удаляем все файлы, у которых счётчик = 0
-            var filenames = await collection.FindAsync(filter).Result.ToListAsync(stoppingToken);
-            foreach (var filename in filenames)
-            {
-                var file = filename["token"].AsString;
-                var path = Path.Combine("files", file);
-                File.Delete(path);
-                _logger.LogInformation($"File {file} deleted");
-            }
-            
-            await collection.DeleteManyAsync(filter, stoppingToken);
+            var filenames = await mongo.GetReadyFiles();
+            file.DeleteFiles(filenames);
 
             _logger.LogInformation("All counters decremented");
 

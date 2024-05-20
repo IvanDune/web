@@ -5,12 +5,7 @@
       "commandName": "Project",
       "dotnetRunMessages": true,
       "environmentVariables": {
-        "DOTNET_ENVIRONMENT": "Development",
-        "MONGO_URL": "mongodb://duna:3cf9a12f376869cc86ca096f450fb4b87be7f059@46.138.252.231:27017/",
-        "HOSTNAME": "46.138.252.231",
-        "USER": "duna",
-        "PASSWORD": "3cf9a12f376869cc86ca096f450fb4b87be7f059",
-        "FILE_DIRECTORY": "C:\\Users\\ivang\\RiderProjects\\Duna1\\DunaService\\files"
+        "DOTNET_ENVIRONMENT": "Development"
       }
     }
   }
