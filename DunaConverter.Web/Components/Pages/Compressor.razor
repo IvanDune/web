@@ -1,0 +1,137 @@
+@page "/compressor"
+@using System.Net.Http.Json
+@inject HttpClient Http
+@implements IDisposable
+@rendermode InteractiveServer
+@inject IJSRuntime JS
+
+<PageTitle>Compressor</PageTitle>
+
+<h3>Audio/Video Compressor</h3>
+
+<div class="dropzone">
+    <p>Drag and drop a file here or click to select a file</p>
+    <InputFile OnChange="HandleFileSelected" ref="fileInput"/>
+</div>
+
+<button @onclick="UploadFile">Upload</button>
+
+@if (!string.IsNullOrEmpty(statusMessage))
+{
+    <p>@statusMessage</p>
+}
+
+@code {
+    private ElementReference fileInput;
+    private IBrowserFile selectedFile;
+    private string statusMessage;
+    private string taskId;
+    private Timer timer;
+
+    private async Task HandleFileSelected(InputFileChangeEventArgs e)
+    {
+        selectedFile = e.File;
+    }
+    
+    private async Task UploadFile()
+    {
+        if (selectedFile == null)
+        {
+            statusMessage = "Please select a file.";
+            return;
+        }
+
+        var content = new MultipartFormDataContent();
+        content.Add(new StreamContent(selectedFile.OpenReadStream(maxAllowedSize: Int64.MaxValue)), "file", selectedFile.Name);
+
+        var response = await Http.PostAsync("http://api:8080/compress", content);
+        if (response.IsSuccessStatusCode)
+        {
+            var result = await response.Content.ReadFromJsonAsync<UploadResult>();
+            taskId = result.TaskId;
+            statusMessage = "File uploaded successfully. Checking status...";
+            StartCheckingStatus();
+        }
+        else
+        {
+            statusMessage = "File upload failed.";
+        }
+    }
+
+    private void StartCheckingStatus()
+    {
+        timer = new Timer(async _ => await CheckStatus(), null, 0, 5000);
+    }
+
+    private async Task CheckStatus()
+    {
+        var response = await Http.PostAsJsonAsync("http://api:8080/checktask", new { id = taskId });
+        if (response.IsSuccessStatusCode)
+        {
+            var result = await response.Content.ReadFromJsonAsync<CheckTaskResult>();
+            if (result.Status == 2)
+            {
+                timer.Dispose();
+                await InvokeAsync(() =>
+                {
+                    statusMessage = "File is ready. Click to download.";
+                    StateHasChanged();
+                });
+                await DownloadFile();
+            }
+            else if (result.Status == -1)
+            {
+                timer.Dispose();
+                await InvokeAsync(() =>
+                {
+                    statusMessage = "There has been an error processing the file.";
+                    StateHasChanged();
+                });
+            }
+            else
+            {
+                await InvokeAsync(() =>
+                {
+                    statusMessage = "File is still being processed...";
+                    StateHasChanged();
+                });
+            }
+        }
+        else
+        {
+            statusMessage = "Failed to check status.";
+        }
+    }
+
+    private async Task DownloadFile()
+    {
+        var response = await Http.GetAsync($"http://api:8080/getfile?id={taskId}");
+        if (response.IsSuccessStatusCode)
+        {
+            var fileName = response.Content.Headers.ContentDisposition.FileNameStar;
+            var fileStream = await response.Content.ReadAsStreamAsync();
+            using var streamRef = new DotNetStreamReference(stream: fileStream);
+            await JS.InvokeVoidAsync("downloadFileFromStream", fileName, streamRef);
+        }
+        else
+        {
+            statusMessage = "Failed to download file.";
+        }
+    }
+
+    public void Dispose()
+    {
+        timer?.Dispose();
+    }
+
+    private class UploadResult
+    {
+        public string TaskId { get; set; }
+    }
+
+    private class CheckTaskResult
+    {
+        public int Status { get; set; }
+    }
+
+}
