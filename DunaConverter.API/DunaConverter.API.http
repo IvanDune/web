@@ -1,0 +1,6 @@
+@DunaConverter.API_HostAddress = http://localhost:5216
+
+GET {{DunaConverter.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

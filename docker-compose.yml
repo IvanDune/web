@@ -1,0 +1,70 @@
+﻿services:
+  orchestrator:
+    build:
+      context: .
+      dockerfile: DunaConverter.Orchestrator/Dockerfile
+    volumes:
+      - /home/olegsea/Duna/data:/mnt/data
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      mongo:
+        condition: service_started
+    user: "1000:1000"
+
+  worker:
+    build:
+      context: .
+      dockerfile: DunaConverter.Worker/Dockerfile
+    volumes:
+      - /home/olegsea/Duna/data:/mnt/data
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      mongo:
+        condition: service_started
+    user: "1000:1000"
+      
+  api:
+    build:
+      context: .
+      dockerfile: DunaConverter.Api/Dockerfile
+    ports:
+      - 8080:8080
+    volumes:
+      - /home/olegsea/Duna/data:/mnt/data
+    depends_on:
+      mongo:
+        condition: service_started
+    user: "1000:1000"
+        
+  web:
+    build:
+      context: .
+      dockerfile: DunaConverter.Web/Dockerfile
+    depends_on:
+      - api
+    ports:
+      - 3000:8080
+    
+  rabbitmq:
+    image: rabbitmq:3.10.7-management
+    hostname: rabbitmq
+    environment:
+      - RABBITMQ_DEFAULT_USER=Duna
+      - RABBITMQ_DEFAULT_PASS=3cf9a12f376869cc86ca096f450fb4b87be7f059
+      - RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS=-rabbit disk_free_limit 2147483648
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 5s
+      timeout: 15s
+      retries: 5
+  mongo:
+    image: mongo
+    restart: always
+    hostname: mongo
+    ports:
+        - 27018:27017
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: Duna
+      MONGO_INITDB_ROOT_PASSWORD: 3cf9a12f376869cc86ca096f450fb4b87be7f059

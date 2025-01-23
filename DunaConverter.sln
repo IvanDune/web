@@ -1,0 +1,40 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DunaConverter.API", "DunaConverter.API\DunaConverter.API.csproj", "{D924478B-D6BA-4EB7-92A0-0DCB016C0C49}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DunaConverter.Orchestrator", "DunaConverter.Orchestrator\DunaConverter.Orchestrator.csproj", "{C773DFA7-80CD-4E05-9E26-6D469BC0110A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DunaConverter.Handlers", "DunaConverter.Handlers\DunaConverter.Handlers.csproj", "{3B3F2A4A-620B-47C4-ACE0-6D09BF332BA4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DunaConverter.Worker", "DunaConverter.Worker\DunaConverter.Worker.csproj", "{EB26FB12-6711-4FD4-AB01-2E183FE129A2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DunaConverter.Web", "DunaConverter.Web\DunaConverter.Web.csproj", "{D142D215-6ACB-4615-8FA0-2930BD31EE44}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D924478B-D6BA-4EB7-92A0-0DCB016C0C49}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D924478B-D6BA-4EB7-92A0-0DCB016C0C49}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D924478B-D6BA-4EB7-92A0-0DCB016C0C49}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D924478B-D6BA-4EB7-92A0-0DCB016C0C49}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C773DFA7-80CD-4E05-9E26-6D469BC0110A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C773DFA7-80CD-4E05-9E26-6D469BC0110A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C773DFA7-80CD-4E05-9E26-6D469BC0110A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C773DFA7-80CD-4E05-9E26-6D469BC0110A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3B3F2A4A-620B-47C4-ACE0-6D09BF332BA4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3B3F2A4A-620B-47C4-ACE0-6D09BF332BA4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3B3F2A4A-620B-47C4-ACE0-6D09BF332BA4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3B3F2A4A-620B-47C4-ACE0-6D09BF332BA4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EB26FB12-6711-4FD4-AB01-2E183FE129A2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EB26FB12-6711-4FD4-AB01-2E183FE129A2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EB26FB12-6711-4FD4-AB01-2E183FE129A2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EB26FB12-6711-4FD4-AB01-2E183FE129A2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D142D215-6ACB-4615-8FA0-2930BD31EE44}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D142D215-6ACB-4615-8FA0-2930BD31EE44}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D142D215-6ACB-4615-8FA0-2930BD31EE44}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D142D215-6ACB-4615-8FA0-2930BD31EE44}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
